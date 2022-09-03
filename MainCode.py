@@ -44,16 +44,45 @@ for i in range(58):
     CsvName = 'Case_' + i
     
     # globals() 함수로 여러 csv 파싱, 선언
+    # 형식 train01, 02 
     Parse1 = globals()['train' + str(i)] =  pd.read_csv(r'open\\train_input\\{}.csv'.format(CsvName),encoding = 'UTF-8')
     
+    # 형식 train_result01, 02
     # 이제 growth rate y값도 파싱해준다.
     Parse2 = globals()["train_result" + str(i)] = pd.read_csv(r'open\\train_target\\{}.csv'.format(CsvName),encoding = 'UTF-8')
     
+
     
-    # # 파싱한 2 Csv를 합쳐줍니다 target 값은  28개로 row 개수가 적으니 일단 내비둠.
-    # globals()['concated_csv' + i] = pd.concat([Parse1,Parse2], axis = 0)
+    # datetime 적용
+    Parse1['시간'] = pd.to_datetime(Parse1['시간'].str.strip(), format='%Y-%m-%d %H:%M:%S', errors='raise')
+    Parse1.set_index('시간', inplace=True)
+    
+    
+    
+    # 에러나면 사용할 칼럼이름 변경
+    # df.columns = ['01',
+    #               '02',
+    #               '03',
+    #               '04',
+    #               ]
+    
+    # day 별로 리샘플링
+
+    Parse1 =  Parse1.resample(rule='D').mean()
+    
+    # # 파싱한 2 Csv를 합쳐줍니다 
+    # globals()['concated_csv' + i] = pd.concat([Parse1,Parse2], axis = 1 , join = "outer")
+    globals()['train_info' + i] = Parse1
+    globals()['target_info' + i] = Parse2
+
+
+
+
+
+
+
+
+
     
 
 
-    
-    
